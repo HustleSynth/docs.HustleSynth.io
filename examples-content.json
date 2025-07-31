@@ -1,0 +1,1642 @@
+// Examples and Final Documentation Content
+
+function getExamplesContent() {
+    return `
+        <h1>Code Examples</h1>
+        
+        <p>Practical examples to help you get started with common use cases.</p>
+        
+        <h2>Chatbot Implementation</h2>
+        
+        <h3>Simple Console Chatbot (Node.js)</h3>
+        
+        <pre><code class="language-javascript">const HustleSynth = require('hustlesynth');
+const readline = require('readline');
+
+const client = new HustleSynth({
+    apiKey: process.env.HUSTLESYNTH_API_KEY
+});
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+const messages = [
+    { role: 'system', content: 'You are a helpful assistant.' }
+];
+
+async function chat() {
+    rl.question('You: ', async (input) => {
+        if (input.toLowerCase() === 'exit') {
+            rl.close();
+            return;
+        }
+        
+        messages.push({ role: 'user', content: input });
+        
+        try {
+            const completion = await client.chat.completions.create({
+                model: 'gpt-3.5-turbo',
+                messages: messages,
+                stream: true
+            });
+            
+            process.stdout.write('Assistant: ');
+            let assistantMessage = '';
+            
+            for await (const chunk of completion) {
+                const content = chunk.choices[0]?.delta?.content || '';
+                process.stdout.write(content);
+                assistantMessage += content;
+            }
+            
+            console.log('\\n');
+            messages.push({ role: 'assistant', content: assistantMessage });
+            
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+        
+        chat(); // Continue conversation
+    });
+}
+
+console.log('Chatbot started. Type "exit" to quit.\\n');
+chat();</code></pre>
+        
+        <h3>Web-based Chat Interface</h3>
+        
+        <pre><code class="language-html">&lt;!-- HTML --&gt;
+&lt;div id="chat-container"&gt;
+    &lt;div id="messages"&gt;&lt;/div&gt;
+    &lt;form id="chat-form"&gt;
+        &lt;input type="text" id="user-input" placeholder="Type a message..."&gt;
+        &lt;button type="submit"&gt;Send&lt;/button&gt;
+    &lt;/form&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+// JavaScript
+const messages = [];
+const messagesDiv = document.getElementById('messages');
+const form = document.getElementById('chat-form');
+const input = document.getElementById('user-input');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const userMessage = input.value.trim();
+    if (!userMessage) return;
+    
+    // Add user message to UI
+    addMessage('user', userMessage);
+    messages.push({ role: 'user', content: userMessage });
+    
+    input.value = '';
+    input.disabled = true;
+    
+    // Show typing indicator
+    const typingDiv = addMessage('assistant', '...');
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ messages })
+        });
+        
+        const data = await response.json();
+        
+        // Update typing indicator with response
+        typingDiv.textContent = data.content;
+        messages.push({ role: 'assistant', content: data.content });
+        
+    } catch (error) {
+        typingDiv.textContent = 'Error: ' + error.message;
+        typingDiv.classList.add('error');
+    }
+    
+    input.disabled = false;
+    input.focus();
+});
+
+function addMessage(role, content) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = \`message \${role}\`;
+    messageDiv.textContent = content;
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return messageDiv;
+}
+&lt;/script&gt;</code></pre>
+        
+        <h2>Content Generation</h2>
+        
+        <h3>Blog Post Generator</h3>
+        
+        <pre><code class="language-python">from hustlesynth import HustleSynth
+import json
+
+client = HustleSynth()
+
+def generate_blog_post(topic, tone="professional", length=1000):
+    """Generate a blog post on a given topic"""
+    
+    prompt = f"""
+    Write a {tone} blog post about "{topic}".
+    Target length: approximately {length} words.
+    Include:
+    - An engaging introduction
+    - 3-5 main points with subheadings
+    - A conclusion with call-to-action
+    Format with markdown.
+    """
+    
+    completion = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are an expert content writer."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=2000
+    )
+    
+    return completion.choices[0].message.content
+
+# Generate blog post
+blog_post = generate_blog_post(
+    topic="The Future of AI in Healthcare",
+    tone="informative yet accessible",
+    length=800
+)
+
+print(blog_post)</code></pre>
+        
+        <h3>Product Description Generator</h3>
+        
+        <pre><code class="language-javascript">async function generateProductDescriptions(products) {
+    const client = new HustleSynth({
+        apiKey: process.env.HUSTLESYNTH_API_KEY
+    });
+    
+    const descriptions = [];
+    
+    for (const product of products) {
+        const prompt = \`
+        Create a compelling product description for:
+        Name: \${product.name}
+        Category: \${product.category}
+        Features: \${product.features.join(', ')}
+        Price: $\${product.price}
+        
+        Requirements:
+        - 100-150 words
+        - SEO-friendly
+        - Highlight key benefits
+        - Include a call-to-action
+        \`;
+        
+        const completion = await client.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'You are an expert e-commerce copywriter.'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            temperature: 0.8
+        });
+        
+        descriptions.push({
+            product: product.name,
+            description: completion.choices[0].message.content
+        });
+    }
+    
+    return descriptions;
+}
+
+// Example usage
+const products = [
+    {
+        name: 'Smart Water Bottle',
+        category: 'Fitness',
+        features: ['Temperature display', 'Hydration reminder', 'BPA-free'],
+        price: 39.99
+    }
+];
+
+const descriptions = await generateProductDescriptions(products);</code></pre>
+        
+        <h2>Data Analysis</h2>
+        
+        <h3>CSV Data Analysis</h3>
+        
+        <pre><code class="language-python">import pandas as pd
+from hustlesynth import HustleSynth
+
+client = HustleSynth()
+
+def analyze_csv_data(csv_path):
+    """Analyze CSV data using AI"""
+    
+    # Read CSV
+    df = pd.read_csv(csv_path)
+    
+    # Get basic info
+    info = {
+        "columns": list(df.columns),
+        "shape": df.shape,
+        "dtypes": df.dtypes.to_dict(),
+        "sample": df.head().to_dict(),
+        "summary": df.describe().to_dict()
+    }
+    
+    prompt = f"""
+    Analyze this dataset and provide insights:
+    
+    Dataset Info:
+    {json.dumps(info, indent=2)}
+    
+    Please provide:
+    1. Key observations about the data
+    2. Potential data quality issues
+    3. Interesting patterns or correlations
+    4. Recommendations for further analysis
+    """
+    
+    completion = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a data analyst expert."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.3
+    )
+    
+    return completion.choices[0].message.content
+
+# Analyze data
+insights = analyze_csv_data("sales_data.csv")
+print(insights)</code></pre>
+        
+        <h2>Code Generation</h2>
+        
+        <h3>Function Generator</h3>
+        
+        <pre><code class="language-javascript">async function generateFunction(description, language = 'javascript') {
+    const completion = await client.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+            {
+                role: 'system',
+                content: \`You are an expert \${language} developer. Generate clean, well-documented code.\`
+            },
+            {
+                role: 'user',
+                content: \`Create a function that: \${description}
+                
+                Requirements:
+                - Include JSDoc/docstring
+                - Handle edge cases
+                - Add example usage
+                - Optimize for performance\`
+            }
+        ],
+        temperature: 0.2
+    });
+    
+    return completion.choices[0].message.content;
+}
+
+// Example
+const code = await generateFunction(
+    "validates email addresses using regex and returns detailed validation results",
+    "javascript"
+);
+
+console.log(code);</code></pre>
+        
+        <h3>SQL Query Generator</h3>
+        
+        <pre><code class="language-python">def generate_sql_query(natural_language_query, schema):
+    """Convert natural language to SQL"""
+    
+    prompt = f"""
+    Database Schema:
+    {json.dumps(schema, indent=2)}
+    
+    User Query: "{natural_language_query}"
+    
+    Generate a SQL query that answers the user's question.
+    Include:
+    - Proper JOIN conditions
+    - WHERE clauses as needed
+    - Appropriate aggregations
+    - ORDER BY for better readability
+    """
+    
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a SQL expert. Generate valid, optimized SQL queries."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.1
+    )
+    
+    return completion.choices[0].message.content
+
+# Example schema
+schema = {
+    "users": ["id", "name", "email", "created_at"],
+    "orders": ["id", "user_id", "total", "status", "created_at"],
+    "products": ["id", "name", "price", "category"]
+}
+
+# Generate query
+sql = generate_sql_query(
+    "Show me the top 10 customers by total order value this month",
+    schema
+)
+
+print(sql)</code></pre>
+        
+        <h2>Image Generation</h2>
+        
+        <h3>Product Image Generator</h3>
+        
+        <pre><code class="language-javascript">async function generateProductImages(productName, variations = 3) {
+    const images = [];
+    
+    for (let i = 0; i < variations; i++) {
+        const style = ['minimalist', 'realistic', 'artistic'][i];
+        
+        const response = await client.images.generate({
+            model: 'dall-e-3',
+            prompt: \`Professional product photo of \${productName}, 
+                     \${style} style, white background, studio lighting, 
+                     high resolution, commercial photography\`,
+            n: 1,
+            size: '1024x1024',
+            quality: 'hd'
+        });
+        
+        images.push({
+            style,
+            url: response.data[0].url,
+            prompt: response.data[0].revised_prompt
+        });
+    }
+    
+    return images;
+}
+
+// Generate variations
+const images = await generateProductImages("luxury smartwatch");
+images.forEach(img => {
+    console.log(\`\${img.style}: \${img.url}\`);
+});</code></pre>
+        
+        <h2>Document Processing</h2>
+        
+        <h3>Document Summarizer</h3>
+        
+        <pre><code class="language-python">def summarize_document(file_path, max_length=500):
+    """Summarize a document maintaining key points"""
+    
+    # Read document
+    with open(file_path, 'r') as f:
+        content = f.read()
+    
+    # Split into chunks if too long
+    max_tokens = 3000
+    chunks = [content[i:i+max_tokens] for i in range(0, len(content), max_tokens)]
+    
+    summaries = []
+    
+    for i, chunk in enumerate(chunks):
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert at creating concise, accurate summaries."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Summarize this text (part {i+1}/{len(chunks)}):
+                    
+                    {chunk}
+                    
+                    Focus on key points and maintain context."""
+                }
+            ],
+            temperature=0.3,
+            max_tokens=max_length
+        )
+        
+        summaries.append(completion.choices[0].message.content)
+    
+    # If multiple chunks, create final summary
+    if len(summaries) > 1:
+        final_summary = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Combine these summaries into one cohesive summary."
+                },
+                {
+                    "role": "user",
+                    "content": "\\n\\n".join(summaries)
+                }
+            ],
+            temperature=0.3,
+            max_tokens=max_length
+        )
+        
+        return final_summary.choices[0].message.content
+    
+    return summaries[0]
+
+# Summarize a document
+summary = summarize_document("research_paper.txt", max_length=300)
+print(summary)</code></pre>
+        
+        <h2>Real-time Applications</h2>
+        
+        <h3>Live Translation Service</h3>
+        
+        <pre><code class="language-javascript">class TranslationService {
+    constructor(apiKey) {
+        this.client = new HustleSynth({ apiKey });
+        this.cache = new Map();
+    }
+    
+    async translate(text, targetLang, sourceLang = 'auto') {
+        // Check cache
+        const cacheKey = \`\${text}-\${sourceLang}-\${targetLang}\`;
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+        
+        const completion = await this.client.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: \`You are a professional translator. 
+                             Translate accurately while preserving tone and context.
+                             Output only the translation, no explanations.\`
+                },
+                {
+                    role: 'user',
+                    content: \`Translate from \${sourceLang} to \${targetLang}: "\${text}"\`
+                }
+            ],
+            temperature: 0.3,
+            max_tokens: text.length * 2 // Rough estimate
+        });
+        
+        const translation = completion.choices[0].message.content;
+        
+        // Cache result
+        this.cache.set(cacheKey, translation);
+        
+        return translation;
+    }
+    
+    async detectLanguage(text) {
+        const completion = await this.client.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'user',
+                    content: \`Detect the language of this text and respond with just the ISO 639-1 code: "\${text}"\`
+                }
+            ],
+            temperature: 0
+        });
+        
+        return completion.choices[0].message.content.trim();
+    }
+}
+
+// Usage
+const translator = new TranslationService(process.env.HUSTLESYNTH_API_KEY);
+
+// Translate text
+const spanish = await translator.translate("Hello, how are you?", "es");
+console.log(spanish); // "Hola, ¿cómo estás?"
+
+// Detect language
+const lang = await translator.detectLanguage("Bonjour le monde");
+console.log(lang); // "fr"</code></pre>
+        
+        <h2>Error Handling & Retry Logic</h2>
+        
+        <pre><code class="language-javascript">class ResilientClient {
+    constructor(apiKey, options = {}) {
+        this.client = new HustleSynth({ apiKey });
+        this.maxRetries = options.maxRetries || 3;
+        this.backoffMultiplier = options.backoffMultiplier || 2;
+        this.initialDelay = options.initialDelay || 1000;
+    }
+    
+    async callWithRetry(fn, attempt = 1) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (attempt >= this.maxRetries) {
+                throw error;
+            }
+            
+            // Check if error is retryable
+            if (error.status === 429 || error.status >= 500) {
+                const delay = this.initialDelay * Math.pow(this.backoffMultiplier, attempt - 1);
+                
+                console.log(\`Retry attempt \${attempt} after \${delay}ms\`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                
+                return this.callWithRetry(fn, attempt + 1);
+            }
+            
+            throw error;
+        }
+    }
+    
+    async createCompletion(params) {
+        return this.callWithRetry(() => 
+            this.client.chat.completions.create(params)
+        );
+    }
+}
+
+// Usage with automatic retry
+const resilientClient = new ResilientClient(process.env.HUSTLESYNTH_API_KEY);
+
+try {
+    const completion = await resilientClient.createCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: 'Hello!' }]
+    });
+    
+    console.log(completion.choices[0].message.content);
+} catch (error) {
+    console.error('Failed after retries:', error);
+}</code></pre>
+    `;
+}
+
+function getBestPracticesContent() {
+    return `
+        <h1>Best Practices</h1>
+        
+        <p>Follow these best practices to optimize your use of the HustleSynth API for performance, cost-efficiency, and reliability.</p>
+        
+        <h2>API Key Security</h2>
+        
+        <h3>Never Expose Keys in Client-Side Code</h3>
+        
+        <div class="alert alert-error">
+            <strong>Bad:</strong> Including API keys in frontend JavaScript
+        </div>
+        
+        <pre><code class="language-javascript">// ❌ NEVER DO THIS
+const client = new HustleSynth({
+    apiKey: 'hs_live_abc123...' // Exposed to anyone
+});</code></pre>
+        
+        <div class="alert alert-success">
+            <strong>Good:</strong> Use a backend proxy
+        </div>
+        
+        <pre><code class="language-javascript">// ✅ Frontend calls your backend
+const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer ' + userToken // Your app's auth
+    },
+    body: JSON.stringify({ message })
+});
+
+// ✅ Backend handles API key
+app.post('/api/chat', authenticate, async (req, res) => {
+    const completion = await hustlesynth.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: req.body.messages
+    });
+    res.json(completion);
+});</code></pre>
+        
+        <h3>Environment Variables</h3>
+        
+        <pre><code class="language-bash"># .env file
+HUSTLESYNTH_API_KEY=hs_live_abc123...
+
+# Never commit .env files
+echo ".env" >> .gitignore</code></pre>
+        
+        <h3>Key Rotation</h3>
+        
+        <pre><code class="language-javascript">// Implement key rotation
+class KeyManager {
+    constructor() {
+        this.keys = [
+            process.env.HUSTLESYNTH_KEY_1,
+            process.env.HUSTLESYNTH_KEY_2
+        ];
+        this.currentIndex = 0;
+    }
+    
+    getCurrentKey() {
+        return this.keys[this.currentIndex];
+    }
+    
+    rotateKey() {
+        this.currentIndex = (this.currentIndex + 1) % this.keys.length;
+        console.log('Rotated to key index:', this.currentIndex);
+    }
+    
+    // Rotate keys periodically
+    startRotation(intervalHours = 24) {
+        setInterval(() => {
+            this.rotateKey();
+        }, intervalHours * 60 * 60 * 1000);
+    }
+}</code></pre>
+        
+        <h2>Performance Optimization</h2>
+        
+        <h3>Implement Caching</h3>
+        
+        <pre><code class="language-javascript">class CachedClient {
+    constructor(client, cacheOptions = {}) {
+        this.client = client;
+        this.cache = new Map();
+        this.ttl = cacheOptions.ttl || 3600000; // 1 hour default
+        this.maxSize = cacheOptions.maxSize || 1000;
+    }
+    
+    getCacheKey(params) {
+        return crypto
+            .createHash('md5')
+            .update(JSON.stringify(params))
+            .digest('hex');
+    }
+    
+    async createCompletion(params) {
+        const key = this.getCacheKey(params);
+        const cached = this.cache.get(key);
+        
+        if (cached && Date.now() - cached.timestamp < this.ttl) {
+            return cached.data;
+        }
+        
+        const response = await this.client.chat.completions.create(params);
+        
+        // Manage cache size
+        if (this.cache.size >= this.maxSize) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+        
+        this.cache.set(key, {
+            data: response,
+            timestamp: Date.now()
+        });
+        
+        return response;
+    }
+}</code></pre>
+        
+        <h3>Batch Processing</h3>
+        
+        <pre><code class="language-python">async def batch_process_with_rate_limit(items, processor_fn, batch_size=10, delay_ms=100):
+    """Process items in batches with rate limiting"""
+    
+    results = []
+    
+    for i in range(0, len(items), batch_size):
+        batch = items[i:i + batch_size]
+        
+        # Process batch concurrently
+        batch_results = await asyncio.gather(*[
+            processor_fn(item) for item in batch
+        ])
+        
+        results.extend(batch_results)
+        
+        # Rate limit between batches
+        if i + batch_size < len(items):
+            await asyncio.sleep(delay_ms / 1000)
+    
+    return results
+
+# Example usage
+async def process_item(text):
+    response = await client.chat.completions.create({
+        "model": "gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": f"Summarize: {text}"}],
+        "max_tokens": 50
+    })
+    return response.choices[0].message.content
+
+texts = ["Long text 1...", "Long text 2...", "Long text 3..."]
+summaries = await batch_process_with_rate_limit(texts, process_item)</code></pre>
+        
+        <h2>Cost Optimization</h2>
+        
+        <h3>Model Selection Strategy</h3>
+        
+        <pre><code class="language-javascript">class SmartModelSelector {
+    constructor(client) {
+        this.client = client;
+    }
+    
+    async selectModel(task, content) {
+        // Use cheaper models for simple tasks
+        const taskComplexity = this.assessComplexity(task, content);
+        
+        const modelMap = {
+            simple: 'gpt-3.5-turbo',
+            moderate: 'gpt-3.5-turbo',
+            complex: 'gpt-4',
+            vision: 'gpt-4-vision-preview'
+        };
+        
+        return modelMap[taskComplexity];
+    }
+    
+    assessComplexity(task, content) {
+        if (task.includes('vision') || task.includes('image')) {
+            return 'vision';
+        }
+        
+        if (task.includes('code') || task.includes('analysis') || 
+            content.length > 2000) {
+            return 'complex';
+        }
+        
+        if (task.includes('summarize') || task.includes('translate')) {
+            return 'moderate';
+        }
+        
+        return 'simple';
+    }
+    
+    async createOptimizedCompletion(task, content) {
+        const model = await this.selectModel(task, content);
+        
+        console.log(\`Selected model: \${model} for task: \${task}\`);
+        
+        return this.client.chat.completions.create({
+            model,
+            messages: [
+                { role: 'system', content: task },
+                { role: 'user', content: content }
+            ],
+            // Adjust max_tokens based on model
+            max_tokens: model.includes('gpt-4') ? 500 : 150
+        });
+    }
+}</code></pre>
+        
+        <h3>Token Optimization</h3>
+        
+        <pre><code class="language-python">def optimize_prompt(prompt, max_length=1000):
+    """Optimize prompt to reduce token usage"""
+    
+    # Remove excessive whitespace
+    prompt = ' '.join(prompt.split())
+    
+    # Truncate if too long
+    if len(prompt) > max_length:
+        prompt = prompt[:max_length] + "..."
+    
+    # Use concise instructions
+    replacements = {
+        "Please provide": "Provide",
+        "I would like you to": "Please",
+        "Could you please": "Please",
+        "In order to": "To"
+    }
+    
+    for old, new in replacements.items():
+        prompt = prompt.replace(old, new)
+    
+    return prompt
+
+# Example
+original = """
+Please provide a comprehensive analysis of the following data.
+I would like you to identify patterns and anomalies.
+Could you please format your response with bullet points.
+"""
+
+optimized = optimize_prompt(original)
+# Saves ~20% tokens</code></pre>
+        
+        <h2>Error Handling</h2>
+        
+        <h3>Comprehensive Error Handler</h3>
+        
+        <pre><code class="language-javascript">class ErrorHandler {
+    async handle(error, context) {
+        console.error(\`Error in \${context}:\`, error);
+        
+        if (error.status === 401) {
+            throw new Error('Invalid API key. Please check your credentials.');
+        }
+        
+        if (error.status === 429) {
+            const retryAfter = error.headers?.['retry-after'] || 60;
+            throw new Error(\`Rate limit exceeded. Retry after \${retryAfter} seconds.\`);
+        }
+        
+        if (error.status === 400) {
+            throw new Error(\`Invalid request: \${error.message}\`);
+        }
+        
+        if (error.status >= 500) {
+            throw new Error('Server error. Please try again later.');
+        }
+        
+        // Network errors
+        if (error.code === 'ECONNREFUSED') {
+            throw new Error('Cannot connect to API. Check your internet connection.');
+        }
+        
+        if (error.code === 'ETIMEDOUT') {
+            throw new Error('Request timed out. Try again with a shorter prompt.');
+        }
+        
+        throw error;
+    }
+    
+    async withErrorHandling(fn, context) {
+        try {
+            return await fn();
+        } catch (error) {
+            return this.handle(error, context);
+        }
+    }
+}</code></pre>
+        
+        <h2>Monitoring & Logging</h2>
+        
+        <h3>Request Logger</h3>
+        
+        <pre><code class="language-javascript">class RequestLogger {
+    constructor(options = {}) {
+        this.logLevel = options.logLevel || 'info';
+        this.logFile = options.logFile || 'hustlesynth.log';
+    }
+    
+    async logRequest(request, response, duration) {
+        const log = {
+            timestamp: new Date().toISOString(),
+            model: request.model,
+            prompt_tokens: response.usage?.prompt_tokens,
+            completion_tokens: response.usage?.completion_tokens,
+            total_tokens: response.usage?.total_tokens,
+            duration_ms: duration,
+            cost: this.calculateCost(request.model, response.usage),
+            status: 'success'
+        };
+        
+        if (this.logLevel === 'debug') {
+            log.request = request;
+            log.response = response;
+        }
+        
+        console.log(JSON.stringify(log));
+        
+        // Optionally write to file
+        if (this.logFile) {
+            fs.appendFileSync(this.logFile, JSON.stringify(log) + '\\n');
+        }
+        
+        return log;
+    }
+    
+    calculateCost(model, usage) {
+        const pricing = {
+            'gpt-3.5-turbo': { prompt: 0.001, completion: 0.002 },
+            'gpt-4': { prompt: 0.03, completion: 0.06 }
+        };
+        
+        const modelPricing = pricing[model] || { prompt: 0, completion: 0 };
+        
+        return (
+            (usage.prompt_tokens * modelPricing.prompt / 1000) +
+            (usage.completion_tokens * modelPricing.completion / 1000)
+        ).toFixed(4);
+    }
+}</code></pre>
+        
+        <h2>Testing</h2>
+        
+        <h3>Mock Client for Testing</h3>
+        
+        <pre><code class="language-javascript">class MockHustleSynth {
+    constructor(responses = {}) {
+        this.responses = responses;
+        this.calls = [];
+    }
+    
+    chat = {
+        completions: {
+            create: async (params) => {
+                this.calls.push({ method: 'chat.completions.create', params });
+                
+                // Return mock response
+                const mockResponse = this.responses['chat.completions.create'] || {
+                    id: 'mock-completion',
+                    object: 'chat.completion',
+                    created: Date.now(),
+                    model: params.model,
+                    choices: [{
+                        message: {
+                            role: 'assistant',
+                            content: 'Mock response'
+                        },
+                        finish_reason: 'stop',
+                        index: 0
+                    }],
+                    usage: {
+                        prompt_tokens: 10,
+                        completion_tokens: 20,
+                        total_tokens: 30
+                    }
+                };
+                
+                return mockResponse;
+            }
+        }
+    };
+    
+    getCallHistory() {
+        return this.calls;
+    }
+    
+    reset() {
+        this.calls = [];
+    }
+}
+
+// Usage in tests
+describe('ChatBot', () => {
+    let mockClient;
+    let chatBot;
+    
+    beforeEach(() => {
+        mockClient = new MockHustleSynth({
+            'chat.completions.create': {
+                choices: [{
+                    message: {
+                        role: 'assistant',
+                        content: 'Test response'
+                    }
+                }]
+            }
+        });
+        
+        chatBot = new ChatBot(mockClient);
+    });
+    
+    test('should handle user message', async () => {
+        const response = await chatBot.sendMessage('Hello');
+        
+        expect(response).toBe('Test response');
+        expect(mockClient.getCallHistory()).toHaveLength(1);
+        expect(mockClient.getCallHistory()[0].params.messages).toContainEqual({
+            role: 'user',
+            content: 'Hello'
+        });
+    });
+});</code></pre>
+        
+        <h2>Production Checklist</h2>
+        
+        <ul>
+            <li>✅ API keys stored in environment variables</li>
+            <li>✅ Error handling for all API calls</li>
+            <li>✅ Rate limiting implementation</li>
+            <li>✅ Request/response logging</li>
+            <li>✅ Timeout configuration</li>
+            <li>✅ Retry logic with exponential backoff</li>
+            <li>✅ Input validation and sanitization</li>
+            <li>✅ Response caching where appropriate</li>
+            <li>✅ Cost monitoring and alerts</li>
+            <li>✅ Graceful degradation for failures</li>
+            <li>✅ Security headers on all requests</li>
+            <li>✅ CORS configuration for browser apps</li>
+            <li>✅ Health check endpoint</li>
+            <li>✅ Metrics and monitoring</li>
+            <li>✅ Documentation for your API</li>
+        </ul>
+    `;
+}
+
+function getTroubleshootingContent() {
+    return `
+        <h1>Troubleshooting</h1>
+        
+        <p>Common issues and their solutions when using the HustleSynth API.</p>
+        
+        <h2>Authentication Errors</h2>
+        
+        <h3>Error: Invalid API Key</h3>
+        
+        <div class="alert alert-error">
+            <code>401 Unauthorized: Invalid API key provided</code>
+        </div>
+        
+        <p><strong>Causes:</strong></p>
+        <ul>
+            <li>Incorrect API key</li>
+            <li>API key not properly formatted</li>
+            <li>Using a revoked key</li>
+        </ul>
+        
+        <p><strong>Solutions:</strong></p>
+        
+        <pre><code class="language-javascript">// Check your API key format
+// Correct format: hs_live_xxxxxxxxxxxxxxxx
+const client = new HustleSynth({
+    apiKey: 'hs_live_abc123...' // Must start with hs_live_ or hs_test_
+});
+
+// Verify environment variable is loaded
+console.log('API Key:', process.env.HUSTLESYNTH_API_KEY?.substring(0, 10) + '...');
+
+// Test with a simple request
+try {
+    const response = await client.models.list();
+    console.log('Authentication successful');
+} catch (error) {
+    console.error('Authentication failed:', error.message);
+}</code></pre>
+        
+        <h3>Error: Insufficient Permissions</h3>
+        
+        <div class="alert alert-error">
+            <code>403 Forbidden: API key doesn't have permission for this operation</code>
+        </div>
+        
+        <p><strong>Solution:</strong> Check your API key permissions in the dashboard.</p>
+        
+        <h2>Rate Limiting Issues</h2>
+        
+        <h3>Error: Rate Limit Exceeded</h3>
+        
+        <div class="alert alert-error">
+            <code>429 Too Many Requests: Rate limit exceeded</code>
+        </div>
+        
+        <p><strong>Solutions:</strong></p>
+        
+        <pre><code class="language-javascript">// Implement exponential backoff
+async function retryWithBackoff(fn, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (error.status !== 429 || i === maxRetries - 1) {
+                throw error;
+            }
+            
+            const delay = Math.pow(2, i) * 1000;
+            console.log(\`Rate limited. Retrying in \${delay}ms...\`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+}
+
+// Check rate limit headers
+const response = await fetch(url, options);
+console.log('Rate limit remaining:', response.headers.get('X-RateLimit-Remaining'));
+console.log('Rate limit reset:', new Date(response.headers.get('X-RateLimit-Reset') * 1000));</code></pre>
+        
+        <h2>Timeout Errors</h2>
+        
+        <h3>Error: Request Timeout</h3>
+        
+        <div class="alert alert-error">
+            <code>ETIMEDOUT: Request timed out after 30000ms</code>
+        </div>
+        
+        <p><strong>Solutions:</strong></p>
+        
+        <pre><code class="language-javascript">// Increase timeout
+const client = new HustleSynth({
+    apiKey: process.env.HUSTLESYNTH_API_KEY,
+    timeout: 60000 // 60 seconds
+});
+
+// For streaming, use longer timeout
+const stream = await client.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: messages,
+    stream: true,
+    timeout: 120000 // 2 minutes for streaming
+});</code></pre>
+        
+        <h2>Model-Specific Issues</h2>
+        
+        <h3>Error: Model Not Found</h3>
+        
+        <div class="alert alert-error">
+            <code>404 Not Found: Model 'gpt-5' does not exist</code>
+        </div>
+        
+        <p><strong>Solution:</strong> Check available models:</p>
+        
+        <pre><code class="language-javascript">// List all available models
+const models = await client.models.list();
+console.log('Available models:', models.data.map(m => m.id));
+
+// Use a fallback model
+const modelToUse = 'gpt-4';
+const fallbackModel = 'gpt-3.5-turbo';
+
+try {
+    const response = await client.chat.completions.create({
+        model: modelToUse,
+        messages: messages
+    });
+} catch (error) {
+    if (error.status === 404) {
+        console.log(\`Model \${modelToUse} not available, using \${fallbackModel}\`);
+        const response = await client.chat.completions.create({
+            model: fallbackModel,
+            messages: messages
+        });
+    }
+}</code></pre>
+        
+        <h3>Error: Context Length Exceeded</h3>
+        
+        <div class="alert alert-error">
+            <code>400 Bad Request: Maximum context length is 4096 tokens</code>
+        </div>
+        
+        <p><strong>Solutions:</strong></p>
+        
+        <pre><code class="language-python">def truncate_messages(messages, max_tokens=3500):
+    """Truncate messages to fit within token limit"""
+    
+    # Rough estimation: 1 token ≈ 4 characters
+    total_chars = sum(len(msg['content']) for msg in messages)
+    estimated_tokens = total_chars // 4
+    
+    if estimated_tokens <= max_tokens:
+        return messages
+    
+    # Keep system message and truncate older messages
+    system_msg = next((m for m in messages if m['role'] == 'system'), None)
+    other_msgs = [m for m in messages if m['role'] != 'system']
+    
+    # Keep last N messages that fit
+    truncated = []
+    char_count = 0
+    
+    for msg in reversed(other_msgs):
+        msg_chars = len(msg['content'])
+        if char_count + msg_chars > max_tokens * 4:
+            break
+        truncated.insert(0, msg)
+        char_count += msg_chars
+    
+    if system_msg:
+        truncated.insert(0, system_msg)
+    
+    return truncated</code></pre>
+        
+        <h2>Streaming Issues</h2>
+        
+        <h3>Error: Stream Parsing Failed</h3>
+        
+        <p><strong>Common causes:</strong></p>
+        <ul>
+            <li>Incomplete JSON in chunks</li>
+            <li>Network interruptions</li>
+            <li>Incorrect parsing logic</li>
+        </ul>
+        
+        <p><strong>Robust streaming handler:</strong></p>
+        
+        <pre><code class="language-javascript">async function handleStream(response) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\\n');
+            
+            // Keep last incomplete line in buffer
+            buffer = lines.pop() || '';
+            
+            for (const line of lines) {
+                if (line.trim() === '') continue;
+                if (!line.startsWith('data: ')) continue;
+                
+                const data = line.slice(6);
+                if (data === '[DONE]') return;
+                
+                try {
+                    const parsed = JSON.parse(data);
+                    // Process parsed data
+                    yield parsed;
+                } catch (e) {
+                    console.error('Failed to parse chunk:', data);
+                    // Continue processing other chunks
+                }
+            }
+        }
+    } finally {
+        reader.releaseLock();
+    }
+}</code></pre>
+        
+        <h2>CORS Issues (Browser)</h2>
+        
+        <h3>Error: CORS Policy Blocked</h3>
+        
+        <div class="alert alert-error">
+            <code>Access to fetch at 'api.hustlesynth.space' from origin 'localhost:3000' has been blocked by CORS policy</code>
+        </div>
+        
+        <p><strong>Solutions:</strong></p>
+        
+        <ol>
+            <li><strong>Use a backend proxy (recommended)</strong></li>
+            <li><strong>Configure CORS headers on your server</strong></li>
+            <li><strong>Use the dangerouslyAllowBrowser flag (development only)</strong></li>
+        </ol>
+        
+        <pre><code class="language-javascript">// Backend proxy example (Express.js)
+app.use('/api/hustlesynth', async (req, res) => {
+    const response = await fetch('https://api.hustlesynth.space/v1' + req.path, {
+        method: req.method,
+        headers: {
+            'Authorization': 'Bearer ' + process.env.HUSTLESYNTH_API_KEY,
+            'Content-Type': 'application/json'
+        },
+        body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
+    });
+    
+    const data = await response.json();
+    res.json(data);
+});</code></pre>
+        
+        <h2>Performance Issues</h2>
+        
+        <h3>Slow Response Times</h3>
+        
+        <p><strong>Optimization strategies:</strong></p>
+        
+        <pre><code class="language-javascript">// 1. Use appropriate models
+// GPT-3.5-turbo is 10x faster than GPT-4 for most tasks
+
+// 2. Reduce max_tokens
+const completion = await client.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: messages,
+    max_tokens: 100, // Only what you need
+    temperature: 0.7
+});
+
+// 3. Use streaming for better perceived performance
+const stream = await client.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: messages,
+    stream: true
+});
+
+// 4. Implement caching for repeated queries
+const cache = new LRUCache({ max: 500 });
+
+async function getCachedCompletion(prompt) {
+    const cacheKey = createHash('md5').update(prompt).digest('hex');
+    
+    if (cache.has(cacheKey)) {
+        return cache.get(cacheKey);
+    }
+    
+    const result = await createCompletion(prompt);
+    cache.set(cacheKey, result);
+    return result;
+}</code></pre>
+        
+        <h2>Debugging Tips</h2>
+        
+        <h3>Enable Debug Logging</h3>
+        
+        <pre><code class="language-javascript">// Set debug environment variable
+process.env.DEBUG = 'hustlesynth:*';
+
+// Or use custom logger
+const client = new HustleSynth({
+    apiKey: process.env.HUSTLESYNTH_API_KEY,
+    logger: {
+        debug: (...args) => console.log('[DEBUG]', ...args),
+        info: (...args) => console.log('[INFO]', ...args),
+        warn: (...args) => console.warn('[WARN]', ...args),
+        error: (...args) => console.error('[ERROR]', ...args)
+    }
+});</code></pre>
+        
+        <h3>Inspect Raw Responses</h3>
+        
+        <pre><code class="language-javascript">// Intercept responses for debugging
+const originalFetch = fetch;
+global.fetch = async (...args) => {
+    console.log('Request:', args);
+    const response = await originalFetch(...args);
+    
+    // Clone response to read it without consuming
+    const clone = response.clone();
+    const text = await clone.text();
+    console.log('Response:', text);
+    
+    return response;
+};</code></pre>
+        
+        <h2>Common Mistakes</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Mistake</th>
+                    <th>Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Not handling rate limits</td>
+                    <td>Implement retry logic with exponential backoff</td>
+                </tr>
+                <tr>
+                    <td>Exposing API keys in frontend</td>
+                    <td>Use backend proxy or serverless functions</td>
+                </tr>
+                <tr>
+                    <td>Not caching responses</td>
+                    <td>Cache identical requests to save costs</td>
+                </tr>
+                <tr>
+                    <td>Using wrong model for task</td>
+                    <td>Match model capabilities to requirements</td>
+                </tr>
+                <tr>
+                    <td>Ignoring error responses</td>
+                    <td>Implement comprehensive error handling</td>
+                </tr>
+                <tr>
+                    <td>No timeout configuration</td>
+                    <td>Set appropriate timeouts for your use case</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Getting Help</h2>
+        
+        <p>If you're still experiencing issues:</p>
+        
+        <ol>
+            <li><strong>Check the API Status</strong>: <a href="https://status.hustlesynth.space" target="_blank">status.hustlesynth.space</a></li>
+            <li><strong>Search Documentation</strong>: Use the search bar to find relevant information</li>
+            <li><strong>Community Support</strong>: Join our <a href="https://discord.gg/hustlesynth" target="_blank">Discord server</a></li>
+            <li><strong>Email Support</strong>: <a href="mailto:support@hustlesynth.space">support@hustlesynth.space</a></li>
+        </ol>
+        
+        <p>When reporting issues, include:</p>
+        <ul>
+            <li>Error message and status code</li>
+            <li>Request details (model, parameters)</li>
+            <li>SDK version</li>
+            <li>Code snippet reproducing the issue</li>
+            <li>Timestamp of occurrence</li>
+        </ul>
+    `;
+}
+
+function getChangelogContent() {
+    return `
+        <h1>Changelog</h1>
+        
+        <p>Stay updated with the latest changes, improvements, and new features in the HustleSynth platform.</p>
+        
+        <h2>January 2024</h2>
+        
+        <h3>v2.5.0 - January 15, 2024</h3>
+        
+        <h4>🎉 New Features</h4>
+        <ul>
+            <li><strong>Claude 3 Models</strong>: Added support for Claude 3 Opus and Sonnet models</li>
+            <li><strong>Webhook Events</strong>: New webhook events for usage alerts and key management</li>
+            <li><strong>Batch API</strong>: Process multiple requests in a single API call for efficiency</li>
+            <li><strong>Custom Headers</strong>: Support for custom headers in API requests</li>
+        </ul>
+        
+        <h4>🐛 Bug Fixes</h4>
+        <ul>
+            <li>Fixed streaming response parsing for long outputs</li>
+            <li>Resolved timeout issues with large image generation requests</li>
+            <li>Fixed rate limit header parsing in some edge cases</li>
+        </ul>
+        
+        <h4>💔 Breaking Changes</h4>
+        <ul>
+            <li><code>max_length</code> parameter renamed to <code>max_tokens</code> for consistency</li>
+            <li>Removed deprecated <code>engine</code> parameter (use <code>model</code> instead)</li>
+        </ul>
+        
+        <h3>v2.4.0 - January 8, 2024</h3>
+        
+        <h4>🎉 New Features</h4>
+        <ul>
+            <li><strong>GPT-4 Turbo</strong>: Added support for the latest GPT-4 Turbo model</li>
+            <li><strong>Vision API</strong>: Image analysis capabilities with GPT-4 Vision</li>
+            <li><strong>Fine-tuning API</strong>: Create and deploy custom fine-tuned models</li>
+        </ul>
+        
+        <h2>December 2023</h2>
+        
+        <h3>v2.3.0 - December 20, 2023</h3>
+        
+        <h4>🎉 New Features</h4>
+        <ul>
+            <li><strong>DALL-E 3</strong>: Upgraded image generation with DALL-E 3</li>
+            <li><strong>Text-to-Speech</strong>: New TTS models with multiple voices</li>
+            <li><strong>Function Calling</strong>: Enhanced function calling with parallel execution</li>
+        </ul>
+        
+        <h4>🚀 Improvements</h4>
+        <ul>
+            <li>30% faster response times for chat completions</li>
+            <li>Improved error messages with actionable suggestions</li>
+            <li>Better handling of network interruptions in streaming</li>
+        </ul>
+        
+        <h2>SDK Updates</h2>
+        
+        <h3>JavaScript SDK v3.0.0 - January 10, 2024</h3>
+        
+        <pre><code class="language-bash">npm install hustlesynth@latest</code></pre>
+        
+        <h4>New Features</h4>
+        <ul>
+            <li>TypeScript support with complete type definitions</li>
+            <li>Automatic retry with exponential backoff</li>
+            <li>Built-in request/response interceptors</li>
+            <li>Browser support with CORS proxy option</li>
+        </ul>
+        
+        <h4>Migration Guide</h4>
+        
+        <pre><code class="language-javascript">// Old (v2.x)
+const response = await client.completions.create({
+    model: 'gpt-3.5-turbo',
+    prompt: 'Hello',
+    max_length: 100
+});
+
+// New (v3.x)
+const response = await client.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: 'Hello' }],
+    max_tokens: 100
+});</code></pre>
+        
+        <h3>Python SDK v2.0.0 - January 5, 2024</h3>
+        
+        <pre><code class="language-bash">pip install hustlesynth --upgrade</code></pre>
+        
+        <h4>New Features</h4>
+        <ul>
+            <li>Async/await support with AsyncHustleSynth</li>
+            <li>Context managers for automatic cleanup</li>
+            <li>Pydantic models for type safety</li>
+            <li>Integrated logging and debugging</li>
+        </ul>
+        
+        <h2>API Changes</h2>
+        
+        <h3>Deprecations</h3>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Deprecated</th>
+                    <th>Replacement</th>
+                    <th>Removal Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/v1/engines</code></td>
+                    <td><code>/v1/models</code></td>
+                    <td>March 1, 2024</td>
+                </tr>
+                <tr>
+                    <td><code>max_length</code></td>
+                    <td><code>max_tokens</code></td>
+                    <td>February 1, 2024</td>
+                </tr>
+                <tr>
+                    <td><code>best_of</code></td>
+                    <td>Use <code>n</code> parameter</td>
+                    <td>February 15, 2024</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Upcoming Features</h2>
+        
+        <h3>Q1 2024 Roadmap</h3>
+        
+        <ul>
+            <li><strong>Multi-modal Models</strong>: Unified API for text, image, and audio</li>
+            <li><strong>Edge Deployment</strong>: Deploy models closer to users</li>
+            <li><strong>Advanced Analytics</strong>: Real-time usage insights and cost optimization</li>
+            <li><strong>Team Collaboration</strong>: Shared API keys and usage quotas</li>
+            <li><strong>Playground v2</strong>: Interactive testing environment</li>
+        </ul>
+        
+        <h2>Security Updates</h2>
+        
+        <h3>January 2024 Security Patch</h3>
+        
+        <ul>
+            <li>Enhanced API key encryption</li>
+            <li>Improved rate limiting algorithms</li>
+            <li>Additional webhook signature verification</li>
+            <li>Stricter CORS policies</li>
+        </ul>
+        
+        <h2>Performance Improvements</h2>
+        
+        <h3>Infrastructure Upgrades</h3>
+        
+        <ul>
+            <li><strong>Global CDN</strong>: 50ms faster response times worldwide</li>
+            <li><strong>Connection Pooling</strong>: Reduced connection overhead by 70%</li>
+            <li><strong>Caching Layer</strong>: Intelligent caching for repeated requests</li>
+            <li><strong>Load Balancing</strong>: Improved distribution across regions</li>
+        </ul>
+        
+        <h2>Subscribe to Updates</h2>
+        
+        <p>Stay informed about platform updates:</p>
+        
+        <ul>
+            <li><strong>Email Newsletter</strong>: Monthly updates and tips</li>
+            <li><strong>RSS Feed</strong>: <a href="/changelog.rss">changelog.rss</a></li>
+            <li><strong>Discord Announcements</strong>: Real-time updates</li>
+            <li><strong>GitHub Releases</strong>: SDK version releases</li>
+        </ul>
+        
+        <div class="alert alert-info">
+            <strong>API Stability Promise</strong>: We maintain backward compatibility for at least 6 months after deprecation announcements. Breaking changes are rare and well-documented.
+        </div>
+    `;
+}
+
+// Export all content functions
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        getExamplesContent,
+        getBestPracticesContent,
+        getTroubleshootingContent,
+        getChangelogContent
+    };
+}

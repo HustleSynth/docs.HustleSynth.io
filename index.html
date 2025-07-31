@@ -1,39 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>HustleSynth API Docs</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 0 1rem;
-      color: #222;
-      background: #f9f9f9;
-    }
-    h1 {
-      color: #0055aa;
-      text-align: center;
-    }
-    p {
-      line-height: 1.6;
-      font-size: 1.1rem;
-    }
-    a {
-      color: #0055aa;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HustleSynth Documentation - AI Platform API Reference</title>
+    <meta name="description" content="Complete documentation for HustleSynth AI Platform. Learn how to integrate multiple AI models, manage API keys, and build powerful AI applications.">
+    <meta name="keywords" content="HustleSynth, AI, API, Documentation, GPT, Claude, AI Platform">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="HustleSynth Documentation">
+    <meta property="og:description" content="Complete API reference and guides for HustleSynth AI Platform">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://docs.hustlesynth.space">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
-  <h1>HustleSynth API Documentation</h1>
-  <p>Welcome to the API docs. This site will provide detailed info about our endpoints, usage examples, and SDKs.</p>
-  <p>Coming soon — stay tuned!</p>
-  <p><a href="https://hustlesynth.space">Back to main site</a></p>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="/" class="logo">
+                    <i class="fas fa-bolt"></i>
+                    <span>HustleSynth Docs</span>
+                </a>
+            </div>
+            <div class="header-right">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search docs..." onkeyup="searchDocs(event)">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+                <a href="https://panel.hustlesynth.space" class="header-link">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="https://github.com/HustleSynth" class="header-link">
+                    <i class="fab fa-github"></i>
+                </a>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <ul>
+                        <li><a href="#introduction" class="nav-link active" onclick="loadContent('introduction')">
+                            <i class="fas fa-home"></i> Introduction
+                        </a></li>
+                        <li><a href="#quickstart" class="nav-link" onclick="loadContent('quickstart')">
+                            <i class="fas fa-rocket"></i> Quick Start
+                        </a></li>
+                        <li><a href="#authentication" class="nav-link" onclick="loadContent('authentication')">
+                            <i class="fas fa-key"></i> Authentication
+                        </a></li>
+                        <li><a href="#pricing" class="nav-link" onclick="loadContent('pricing')">
+                            <i class="fas fa-tag"></i> Pricing
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>API Reference</h3>
+                    <ul>
+                        <li><a href="#api-overview" class="nav-link" onclick="loadContent('api-overview')">
+                            <i class="fas fa-book"></i> Overview
+                        </a></li>
+                        <li><a href="#chat-completions" class="nav-link" onclick="loadContent('chat-completions')">
+                            <i class="fas fa-comments"></i> Chat Completions
+                        </a></li>
+                        <li><a href="#models" class="nav-link" onclick="loadContent('models')">
+                            <i class="fas fa-brain"></i> Available Models
+                        </a></li>
+                        <li><a href="#streaming" class="nav-link" onclick="loadContent('streaming')">
+                            <i class="fas fa-stream"></i> Streaming
+                        </a></li>
+                        <li><a href="#rate-limits" class="nav-link" onclick="loadContent('rate-limits')">
+                            <i class="fas fa-tachometer-alt"></i> Rate Limits
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li><a href="#api-keys" class="nav-link" onclick="loadContent('api-keys')">
+                            <i class="fas fa-shield-alt"></i> API Keys
+                        </a></li>
+                        <li><a href="#webhooks" class="nav-link" onclick="loadContent('webhooks')">
+                            <i class="fas fa-webhook"></i> Webhooks
+                        </a></li>
+                        <li><a href="#usage-tracking" class="nav-link" onclick="loadContent('usage-tracking')">
+                            <i class="fas fa-chart-line"></i> Usage Tracking
+                        </a></li>
+                        <li><a href="#services" class="nav-link" onclick="loadContent('services')">
+                            <i class="fas fa-cube"></i> Services
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>SDKs & Libraries</h3>
+                    <ul>
+                        <li><a href="#javascript-sdk" class="nav-link" onclick="loadContent('javascript-sdk')">
+                            <i class="fab fa-js"></i> JavaScript/Node.js
+                        </a></li>
+                        <li><a href="#python-sdk" class="nav-link" onclick="loadContent('python-sdk')">
+                            <i class="fab fa-python"></i> Python
+                        </a></li>
+                        <li><a href="#rest-api" class="nav-link" onclick="loadContent('rest-api')">
+                            <i class="fas fa-code"></i> REST API
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#examples" class="nav-link" onclick="loadContent('examples')">
+                            <i class="fas fa-code-branch"></i> Examples
+                        </a></li>
+                        <li><a href="#best-practices" class="nav-link" onclick="loadContent('best-practices')">
+                            <i class="fas fa-lightbulb"></i> Best Practices
+                        </a></li>
+                        <li><a href="#troubleshooting" class="nav-link" onclick="loadContent('troubleshooting')">
+                            <i class="fas fa-tools"></i> Troubleshooting
+                        </a></li>
+                        <li><a href="#changelog" class="nav-link" onclick="loadContent('changelog')">
+                            <i class="fas fa-history"></i> Changelog
+                        </a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content" id="content">
+            <!-- Content will be dynamically loaded here -->
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading documentation...</p>
+            </div>
+        </main>
+
+        <!-- Table of Contents (for current page) -->
+        <aside class="toc" id="toc">
+            <h4>On this page</h4>
+            <ul id="tocList">
+                <!-- TOC items will be generated dynamically -->
+            </ul>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>HustleSynth</h4>
+                <p>The unified AI platform for developers</p>
+                <div class="social-links">
+                    <a href="https://github.com/HustleSynth"><i class="fab fa-github"></i></a>
+                    <a href="https://twitter.com/HustleSynth"><i class="fab fa-twitter"></i></a>
+                    <a href="https://discord.gg/hustlesynth"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Documentation</h4>
+                <ul>
+                    <li><a href="#introduction">Getting Started</a></li>
+                    <li><a href="#api-overview">API Reference</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://panel.hustlesynth.space">Dashboard</a></li>
+                    <li><a href="https://chat.hustlesynth.space">Chat Interface</a></li>
+                    <li><a href="https://status.hustlesynth.space">Status Page</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="mailto:support@hustlesynth.space">Email Support</a></li>
+                    <li><a href="https://discord.gg/hustlesynth">Discord Community</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 HustleSynth. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

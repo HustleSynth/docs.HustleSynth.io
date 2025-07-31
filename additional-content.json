@@ -1,0 +1,997 @@
+// Additional Documentation Content Functions
+
+function getRateLimitsContent() {
+    return `
+        <h1>Rate Limits</h1>
+        
+        <p>HustleSynth implements rate limiting to ensure fair usage and system stability. Rate limits vary based on your subscription plan.</p>
+        
+        <h2>Rate Limit Headers</h2>
+        
+        <p>Every API response includes headers with your current rate limit status:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Header</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>X-RateLimit-Limit</code></td>
+                    <td>Maximum requests per minute</td>
+                    <td><code>60</code></td>
+                </tr>
+                <tr>
+                    <td><code>X-RateLimit-Remaining</code></td>
+                    <td>Remaining requests in current window</td>
+                    <td><code>58</code></td>
+                </tr>
+                <tr>
+                    <td><code>X-RateLimit-Reset</code></td>
+                    <td>Unix timestamp when limit resets</td>
+                    <td><code>1677858300</code></td>
+                </tr>
+                <tr>
+                    <td><code>X-RateLimit-Window</code></td>
+                    <td>Time window in seconds</td>
+                    <td><code>60</code></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Rate Limits by Plan</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Plan</th>
+                    <th>Requests/Min</th>
+                    <th>Requests/Day</th>
+                    <th>Concurrent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Free</strong></td>
+                    <td>20</td>
+                    <td>1,000</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td><strong>Starter</strong></td>
+                    <td>60</td>
+                    <td>10,000</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td><strong>Pro</strong></td>
+                    <td>300</td>
+                    <td>100,000</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td><strong>Enterprise</strong></td>
+                    <td>Custom</td>
+                    <td>Unlimited</td>
+                    <td>Custom</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Rate Limit Errors</h2>
+        
+        <p>When you exceed your rate limit, you'll receive a <code>429 Too Many Requests</code> response:</p>
+        
+        <pre><code class="language-json">{
+    "error": {
+        "message": "Rate limit exceeded. Please retry after 15 seconds.",
+        "type": "rate_limit_error",
+        "code": "rate_limit_exceeded",
+        "retry_after": 15
+    }
+}</code></pre>
+        
+        <h2>Best Practices</h2>
+        
+        <h3>1. Implement Exponential Backoff</h3>
+        
+        <pre><code class="language-javascript">async function makeRequestWithRetry(url, options, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const response = await fetch(url, options);
+            
+            if (response.status === 429) {
+                const retryAfter = response.headers.get('Retry-After') || 
+                                  Math.pow(2, i) * 1000;
+                await new Promise(resolve => setTimeout(resolve, retryAfter));
+                continue;
+            }
+            
+            return response;
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+        }
+    }
+}</code></pre>
+        
+        <h3>2. Monitor Rate Limit Headers</h3>
+        
+        <pre><code class="language-javascript">function checkRateLimit(response) {
+    const remaining = response.headers.get('X-RateLimit-Remaining');
+    const reset = response.headers.get('X-RateLimit-Reset');
+    
+    if (remaining < 10) {
+        console.warn(\`Low rate limit: \${remaining} requests remaining\`);
+        console.log(\`Resets at: \${new Date(reset * 1000)}\`);
+    }
+    
+    return {
+        remaining: parseInt(remaining),
+        reset: parseInt(reset)
+    };
+}</code></pre>
+        
+        <h3>3. Implement Request Queuing</h3>
+        
+        <pre><code class="language-javascript">class RateLimitedQueue {
+    constructor(maxPerMinute) {
+        this.maxPerMinute = maxPerMinute;
+        this.queue = [];
+        this.processing = false;
+    }
+    
+    async add(requestFn) {
+        return new Promise((resolve, reject) => {
+            this.queue.push({ requestFn, resolve, reject });
+            this.process();
+        });
+    }
+    
+    async process() {
+        if (this.processing || this.queue.length === 0) return;
+        
+        this.processing = true;
+        const delay = 60000 / this.maxPerMinute;
+        
+        while (this.queue.length > 0) {
+            const { requestFn, resolve, reject } = this.queue.shift();
+            
+            try {
+                const result = await requestFn();
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+            
+            if (this.queue.length > 0) {
+                await new Promise(r => setTimeout(r, delay));
+            }
+        }
+        
+        this.processing = false;
+    }
+}</code></pre>
+        
+        <h2>Rate Limit Strategies</h2>
+        
+        <h3>Request Batching</h3>
+        <p>Combine multiple operations into a single request when possible:</p>
+        
+        <pre><code class="language-javascript">// Instead of multiple requests
+const results = await Promise.all([
+    createCompletion(prompt1),
+    createCompletion(prompt2),
+    createCompletion(prompt3)
+]);
+
+// Use batch processing
+const batchResponse = await createBatchCompletion([
+    prompt1,
+    prompt2,
+    prompt3
+]);</code></pre>
+        
+        <h3>Caching</h3>
+        <p>Cache responses to reduce API calls:</p>
+        
+        <pre><code class="language-javascript">const cache = new Map();
+
+async function getCachedCompletion(prompt) {
+    const cacheKey = JSON.stringify(prompt);
+    
+    if (cache.has(cacheKey)) {
+        return cache.get(cacheKey);
+    }
+    
+    const response = await createCompletion(prompt);
+    cache.set(cacheKey, response);
+    
+    // Expire cache after 1 hour
+    setTimeout(() => cache.delete(cacheKey), 3600000);
+    
+    return response;
+}</code></pre>
+        
+        <h2>Monitoring Usage</h2>
+        
+        <p>Track your API usage to avoid hitting limits:</p>
+        
+        <pre><code class="language-bash">GET /v1/usage/current</code></pre>
+        
+        <pre><code class="language-json">{
+    "period": {
+        "start": "2024-01-01T00:00:00Z",
+        "end": "2024-01-01T23:59:59Z"
+    },
+    "requests": {
+        "total": 850,
+        "limit": 1000,
+        "remaining": 150
+    },
+    "rate_limit": {
+        "current_minute": 18,
+        "limit_per_minute": 20
+    }
+}</code></pre>
+    `;
+}
+
+function getAPIKeysContent() {
+    return `
+        <h1>API Keys Management</h1>
+        
+        <p>API keys are used to authenticate your requests to the HustleSynth API. You can create multiple keys for different applications or environments.</p>
+        
+        <h2>Creating API Keys</h2>
+        
+        <h3>Via Dashboard</h3>
+        <ol>
+            <li>Log in to <a href="https://panel.hustlesynth.space" target="_blank">panel.hustlesynth.space</a></li>
+            <li>Navigate to "API Keys" section</li>
+            <li>Click "Create New Key"</li>
+            <li>Enter a descriptive name</li>
+            <li>Copy and save your key securely</li>
+        </ol>
+        
+        <h3>Via API</h3>
+        
+        <pre><code class="language-bash">POST /v1/keys</code></pre>
+        
+        <pre><code class="language-json">{
+    "name": "Production Server",
+    "permissions": ["read", "write"],
+    "expires_at": "2024-12-31T23:59:59Z"
+}</code></pre>
+        
+        <h4>Response</h4>
+        
+        <pre><code class="language-json">{
+    "id": "key_abc123",
+    "name": "Production Server",
+    "key": "hs_live_a1b2c3d4e5f6...",
+    "permissions": ["read", "write"],
+    "created_at": "2024-01-01T00:00:00Z",
+    "expires_at": "2024-12-31T23:59:59Z"
+}</code></pre>
+        
+        <div class="alert alert-warning">
+            <strong>Important:</strong> The API key is only shown once in the response. Store it securely as it cannot be retrieved again.
+        </div>
+        
+        <h2>Key Permissions</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Permission</th>
+                    <th>Description</th>
+                    <th>Allowed Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>read</code></td>
+                    <td>Read-only access</td>
+                    <td>GET requests, list operations</td>
+                </tr>
+                <tr>
+                    <td><code>write</code></td>
+                    <td>Write access</td>
+                    <td>POST, PUT, DELETE requests</td>
+                </tr>
+                <tr>
+                    <td><code>admin</code></td>
+                    <td>Administrative access</td>
+                    <td>All operations including key management</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Listing API Keys</h2>
+        
+        <pre><code class="language-bash">GET /v1/keys</code></pre>
+        
+        <h3>Response</h3>
+        
+        <pre><code class="language-json">{
+    "keys": [
+        {
+            "id": "key_abc123",
+            "name": "Production Server",
+            "permissions": ["read", "write"],
+            "last_used": "2024-01-15T10:30:00Z",
+            "created_at": "2024-01-01T00:00:00Z",
+            "expires_at": "2024-12-31T23:59:59Z"
+        },
+        {
+            "id": "key_def456",
+            "name": "Development",
+            "permissions": ["read"],
+            "last_used": null,
+            "created_at": "2024-01-10T00:00:00Z",
+            "expires_at": null
+        }
+    ]
+}</code></pre>
+        
+        <h2>Revoking API Keys</h2>
+        
+        <pre><code class="language-bash">DELETE /v1/keys/{key_id}</code></pre>
+        
+        <h3>Response</h3>
+        
+        <pre><code class="language-json">{
+    "id": "key_abc123",
+    "deleted": true
+}</code></pre>
+        
+        <h2>Key Rotation</h2>
+        
+        <p>Regularly rotate your API keys for security:</p>
+        
+        <h3>Rotation Strategy</h3>
+        
+        <ol>
+            <li>Create a new API key</li>
+            <li>Update your application with the new key</li>
+            <li>Test the new key</li>
+            <li>Revoke the old key</li>
+        </ol>
+        
+        <h3>Automated Rotation</h3>
+        
+        <pre><code class="language-javascript">async function rotateApiKey(oldKeyId) {
+    // Create new key
+    const newKey = await createApiKey({
+        name: 'Rotated Key - ' + new Date().toISOString()
+    });
+    
+    // Update application configuration
+    await updateConfig({
+        HUSTLESYNTH_API_KEY: newKey.key
+    });
+    
+    // Wait for propagation
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    
+    // Test new key
+    const testResponse = await testApiKey(newKey.key);
+    
+    if (testResponse.ok) {
+        // Revoke old key
+        await revokeApiKey(oldKeyId);
+        return newKey;
+    } else {
+        // Rollback if test fails
+        await revokeApiKey(newKey.id);
+        throw new Error('Key rotation failed');
+    }
+}</code></pre>
+        
+        <h2>Security Best Practices</h2>
+        
+        <ul>
+            <li><strong>Environment Variables</strong>: Store keys in environment variables, not in code</li>
+            <li><strong>Separate Keys</strong>: Use different keys for development, staging, and production</li>
+            <li><strong>Minimal Permissions</strong>: Grant only necessary permissions</li>
+            <li><strong>Regular Rotation</strong>: Rotate keys every 90 days</li>
+            <li><strong>Monitoring</strong>: Monitor key usage for anomalies</li>
+            <li><strong>Secure Storage</strong>: Use secret management tools (Vault, AWS Secrets Manager)</li>
+        </ul>
+        
+        <h2>Key Usage Analytics</h2>
+        
+        <p>Monitor your API key usage:</p>
+        
+        <pre><code class="language-bash">GET /v1/keys/{key_id}/usage</code></pre>
+        
+        <pre><code class="language-json">{
+    "key_id": "key_abc123",
+    "period": "last_30_days",
+    "usage": {
+        "total_requests": 45678,
+        "successful_requests": 45123,
+        "failed_requests": 555,
+        "total_tokens": 1234567,
+        "total_cost": 123.45
+    },
+    "daily_usage": [
+        {
+            "date": "2024-01-15",
+            "requests": 1523,
+            "tokens": 41234,
+            "cost": 4.12
+        }
+        // ... more days
+    ]
+}</code></pre>
+    `;
+}
+
+function getWebhooksContent() {
+    return `
+        <h1>Webhooks</h1>
+        
+        <p>Webhooks allow you to receive real-time notifications about events in your HustleSynth account. Set up HTTP endpoints to receive POST requests when specific events occur.</p>
+        
+        <h2>Setting Up Webhooks</h2>
+        
+        <h3>Create a Webhook</h3>
+        
+        <pre><code class="language-bash">POST /v1/webhooks</code></pre>
+        
+        <pre><code class="language-json">{
+    "url": "https://your-app.com/webhook",
+    "events": [
+        "request.completed",
+        "request.failed",
+        "usage.limit_reached"
+    ],
+    "secret": "your-webhook-secret"
+}</code></pre>
+        
+        <h4>Response</h4>
+        
+        <pre><code class="language-json">{
+    "id": "webhook_abc123",
+    "url": "https://your-app.com/webhook",
+    "events": [
+        "request.completed",
+        "request.failed",
+        "usage.limit_reached"
+    ],
+    "secret": "whsec_a1b2c3d4...",
+    "created_at": "2024-01-01T00:00:00Z",
+    "active": true
+}</code></pre>
+        
+        <h2>Available Events</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Description</th>
+                    <th>Payload</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>request.completed</code></td>
+                    <td>API request completed successfully</td>
+                    <td>Request details, usage, cost</td>
+                </tr>
+                <tr>
+                    <td><code>request.failed</code></td>
+                    <td>API request failed</td>
+                    <td>Error details, request info</td>
+                </tr>
+                <tr>
+                    <td><code>usage.limit_reached</code></td>
+                    <td>Usage limit reached</td>
+                    <td>Limit type, current usage</td>
+                </tr>
+                <tr>
+                    <td><code>key.created</code></td>
+                    <td>New API key created</td>
+                    <td>Key info (without secret)</td>
+                </tr>
+                <tr>
+                    <td><code>key.revoked</code></td>
+                    <td>API key revoked</td>
+                    <td>Key ID, revocation reason</td>
+                </tr>
+                <tr>
+                    <td><code>payment.succeeded</code></td>
+                    <td>Payment processed</td>
+                    <td>Invoice details</td>
+                </tr>
+                <tr>
+                    <td><code>payment.failed</code></td>
+                    <td>Payment failed</td>
+                    <td>Failure reason</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Webhook Payload</h2>
+        
+        <p>All webhook payloads follow this structure:</p>
+        
+        <pre><code class="language-json">{
+    "id": "evt_abc123",
+    "type": "request.completed",
+    "created": 1677858242,
+    "data": {
+        // Event-specific data
+    }
+}</code></pre>
+        
+        <h3>Example: Request Completed</h3>
+        
+        <pre><code class="language-json">{
+    "id": "evt_abc123",
+    "type": "request.completed",
+    "created": 1677858242,
+    "data": {
+        "request_id": "req_xyz789",
+        "model": "gpt-3.5-turbo",
+        "usage": {
+            "prompt_tokens": 50,
+            "completion_tokens": 100,
+            "total_tokens": 150
+        },
+        "cost": 0.15,
+        "duration_ms": 1234
+    }
+}</code></pre>
+        
+        <h2>Webhook Security</h2>
+        
+        <h3>Signature Verification</h3>
+        
+        <p>Verify webhook signatures to ensure requests come from HustleSynth:</p>
+        
+        <pre><code class="language-javascript">const crypto = require('crypto');
+
+function verifyWebhookSignature(payload, signature, secret) {
+    const expectedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(payload, 'utf8')
+        .digest('hex');
+    
+    return crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature)
+    );
+}
+
+// Express.js example
+app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
+    const signature = req.headers['x-hustlesynth-signature'];
+    const secret = process.env.WEBHOOK_SECRET;
+    
+    if (!verifyWebhookSignature(req.body, signature, secret)) {
+        return res.status(401).send('Invalid signature');
+    }
+    
+    const event = JSON.parse(req.body);
+    
+    // Process the event
+    switch (event.type) {
+        case 'request.completed':
+            handleRequestCompleted(event.data);
+            break;
+        case 'usage.limit_reached':
+            handleLimitReached(event.data);
+            break;
+        // ... handle other events
+    }
+    
+    res.status(200).send('OK');
+});</code></pre>
+        
+        <h3>Python Example</h3>
+        
+        <pre><code class="language-python">import hmac
+import hashlib
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+
+def verify_webhook_signature(payload, signature, secret):
+    expected_signature = hmac.new(
+        secret.encode('utf-8'),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(signature, expected_signature)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    signature = request.headers.get('X-HustleSynth-Signature')
+    secret = os.environ['WEBHOOK_SECRET']
+    
+    if not verify_webhook_signature(request.data, signature, secret):
+        abort(401)
+    
+    event = request.json
+    
+    # Process the event
+    if event['type'] == 'request.completed':
+        handle_request_completed(event['data'])
+    elif event['type'] == 'usage.limit_reached':
+        handle_limit_reached(event['data'])
+    
+    return 'OK', 200</code></pre>
+        
+        <h2>Managing Webhooks</h2>
+        
+        <h3>List Webhooks</h3>
+        
+        <pre><code class="language-bash">GET /v1/webhooks</code></pre>
+        
+        <h3>Update Webhook</h3>
+        
+        <pre><code class="language-bash">PUT /v1/webhooks/{webhook_id}</code></pre>
+        
+        <h3>Delete Webhook</h3>
+        
+        <pre><code class="language-bash">DELETE /v1/webhooks/{webhook_id}</code></pre>
+        
+        <h2>Testing Webhooks</h2>
+        
+        <p>Test your webhook endpoint:</p>
+        
+        <pre><code class="language-bash">POST /v1/webhooks/{webhook_id}/test</code></pre>
+        
+        <p>This sends a test event to your webhook URL:</p>
+        
+        <pre><code class="language-json">{
+    "id": "evt_test",
+    "type": "test",
+    "created": 1677858242,
+    "data": {
+        "message": "This is a test webhook event"
+    }
+}</code></pre>
+        
+        <h2>Webhook Best Practices</h2>
+        
+        <ul>
+            <li><strong>Idempotency</strong>: Handle duplicate events gracefully</li>
+            <li><strong>Async Processing</strong>: Process webhooks asynchronously</li>
+            <li><strong>Retry Logic</strong>: Implement retry with exponential backoff</li>
+            <li><strong>Logging</strong>: Log all webhook events for debugging</li>
+            <li><strong>Timeouts</strong>: Respond quickly (within 5 seconds)</li>
+            <li><strong>Error Handling</strong>: Return appropriate status codes</li>
+        </ul>
+        
+        <h2>Webhook Retries</h2>
+        
+        <p>Failed webhook deliveries are retried with exponential backoff:</p>
+        
+        <ul>
+            <li>1st retry: 1 minute</li>
+            <li>2nd retry: 5 minutes</li>
+            <li>3rd retry: 30 minutes</li>
+            <li>4th retry: 2 hours</li>
+            <li>5th retry: 8 hours</li>
+        </ul>
+        
+        <p>After 5 failed attempts, the webhook is marked as failed and must be manually re-enabled.</p>
+    `;
+}
+
+function getUsageTrackingContent() {
+    return `
+        <h1>Usage Tracking</h1>
+        
+        <p>Monitor your API usage, costs, and performance metrics through our comprehensive tracking system.</p>
+        
+        <h2>Current Usage</h2>
+        
+        <p>Get your current usage statistics:</p>
+        
+        <pre><code class="language-bash">GET /v1/usage/current</code></pre>
+        
+        <h3>Response</h3>
+        
+        <pre><code class="language-json">{
+    "period": {
+        "start": "2024-01-01T00:00:00Z",
+        "end": "2024-01-31T23:59:59Z"
+    },
+    "usage": {
+        "requests": 45678,
+        "tokens": {
+            "prompt": 1234567,
+            "completion": 2345678,
+            "total": 3580245
+        },
+        "cost": {
+            "amount": 123.45,
+            "currency": "USD"
+        },
+        "credits": {
+            "used": 12345,
+            "remaining": 87655,
+            "total": 100000
+        }
+    },
+    "by_model": {
+        "gpt-3.5-turbo": {
+            "requests": 30000,
+            "tokens": 2000000,
+            "cost": 50.00
+        },
+        "gpt-4": {
+            "requests": 10000,
+            "tokens": 1000000,
+            "cost": 70.00
+        },
+        "claude-3-sonnet": {
+            "requests": 5678,
+            "tokens": 580245,
+            "cost": 3.45
+        }
+    }
+}</code></pre>
+        
+        <h2>Historical Usage</h2>
+        
+        <h3>Daily Usage</h3>
+        
+        <pre><code class="language-bash">GET /v1/usage/daily?start_date=2024-01-01&end_date=2024-01-31</code></pre>
+        
+        <h3>Hourly Usage</h3>
+        
+        <pre><code class="language-bash">GET /v1/usage/hourly?date=2024-01-15</code></pre>
+        
+        <h2>Usage by Category</h2>
+        
+        <h3>By Model</h3>
+        
+        <pre><code class="language-bash">GET /v1/usage/by-model?period=last_30_days</code></pre>
+        
+        <pre><code class="language-json">{
+    "period": "last_30_days",
+    "models": [
+        {
+            "model": "gpt-3.5-turbo",
+            "requests": 30000,
+            "tokens": 2000000,
+            "cost": 50.00,
+            "percentage": 40.65
+        },
+        {
+            "model": "gpt-4",
+            "requests": 10000,
+            "tokens": 1000000,
+            "cost": 70.00,
+            "percentage": 56.91
+        },
+        {
+            "model": "claude-3-sonnet",
+            "requests": 5678,
+            "tokens": 580245,
+            "cost": 3.45,
+            "percentage": 2.44
+        }
+    ],
+    "total": {
+        "requests": 45678,
+        "tokens": 3580245,
+        "cost": 123.45
+    }
+}</code></pre>
+        
+        <h3>By API Key</h3>
+        
+        <pre><code class="language-bash">GET /v1/usage/by-key?period=last_7_days</code></pre>
+        
+        <h2>Cost Breakdown</h2>
+        
+        <pre><code class="language-bash">GET /v1/usage/costs?period=current_month</code></pre>
+        
+        <pre><code class="language-json">{
+    "period": "2024-01",
+    "costs": {
+        "api_usage": {
+            "chat_completions": 100.00,
+            "image_generation": 20.00,
+            "audio_transcription": 3.45,
+            "subtotal": 123.45
+        },
+        "additional": {
+            "priority_processing": 5.00,
+            "data_storage": 0.50,
+            "subtotal": 5.50
+        },
+        "total": 128.95
+    },
+    "credits": {
+        "plan_credits": 100000,
+        "bonus_credits": 5000,
+        "used_credits": 12345,
+        "remaining_credits": 92655
+    }
+}</code></pre>
+        
+        <h2>Usage Alerts</h2>
+        
+        <p>Set up alerts to monitor your usage:</p>
+        
+        <h3>Create Alert</h3>
+        
+        <pre><code class="language-bash">POST /v1/usage/alerts</code></pre>
+        
+        <pre><code class="language-json">{
+    "name": "High Usage Alert",
+    "type": "threshold",
+    "metric": "daily_cost",
+    "threshold": 10.00,
+    "comparison": "greater_than",
+    "notification_channels": ["email", "webhook"]
+}</code></pre>
+        
+        <h3>Alert Types</h3>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Metric</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>threshold</code></td>
+                    <td><code>daily_cost</code></td>
+                    <td>Daily cost exceeds threshold</td>
+                </tr>
+                <tr>
+                    <td><code>threshold</code></td>
+                    <td><code>hourly_requests</code></td>
+                    <td>Hourly requests exceed threshold</td>
+                </tr>
+                <tr>
+                    <td><code>percentage</code></td>
+                    <td><code>credit_usage</code></td>
+                    <td>Credit usage exceeds percentage</td>
+                </tr>
+                <tr>
+                    <td><code>anomaly</code></td>
+                    <td><code>request_rate</code></td>
+                    <td>Unusual request patterns</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Export Usage Data</h2>
+        
+        <p>Export your usage data for analysis:</p>
+        
+        <pre><code class="language-bash">POST /v1/usage/export</code></pre>
+        
+        <pre><code class="language-json">{
+    "format": "csv",
+    "period": {
+        "start": "2024-01-01",
+        "end": "2024-01-31"
+    },
+    "grouping": "daily",
+    "include": ["requests", "tokens", "costs", "models"]
+}</code></pre>
+        
+        <h3>Response</h3>
+        
+        <pre><code class="language-json">{
+    "export_id": "export_abc123",
+    "status": "processing",
+    "download_url": null,
+    "expires_at": null
+}</code></pre>
+        
+        <h2>Usage Dashboard</h2>
+        
+        <p>Access detailed usage analytics in your dashboard:</p>
+        
+        <ul>
+            <li><strong>Real-time Metrics</strong>: Live request counts and latency</li>
+            <li><strong>Historical Trends</strong>: Usage patterns over time</li>
+            <li><strong>Cost Analysis</strong>: Breakdown by model and feature</li>
+            <li><strong>Performance Metrics</strong>: Response times and error rates</li>
+        </ul>
+        
+        <h2>API Usage Best Practices</h2>
+        
+        <h3>1. Implement Caching</h3>
+        
+        <pre><code class="language-javascript">const cache = new Map();
+const CACHE_TTL = 3600000; // 1 hour
+
+async function getCachedResponse(prompt) {
+    const cacheKey = createHash('md5').update(prompt).digest('hex');
+    const cached = cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return cached.response;
+    }
+    
+    const response = await createCompletion(prompt);
+    cache.set(cacheKey, {
+        response,
+        timestamp: Date.now()
+    });
+    
+    return response;
+}</code></pre>
+        
+        <h3>2. Batch Requests</h3>
+        
+        <pre><code class="language-javascript">async function batchProcess(items, batchSize = 10) {
+    const results = [];
+    
+    for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        const batchResults = await Promise.all(
+            batch.map(item => processItem(item))
+        );
+        results.push(...batchResults);
+        
+        // Add delay between batches
+        if (i + batchSize < items.length) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+    
+    return results;
+}</code></pre>
+        
+        <h3>3. Monitor Usage Programmatically</h3>
+        
+        <pre><code class="language-javascript">class UsageMonitor {
+    constructor(threshold) {
+        this.threshold = threshold;
+        this.dailyUsage = 0;
+        this.resetTime = this.getNextResetTime();
+    }
+    
+    async checkUsage() {
+        const usage = await getUsage();
+        this.dailyUsage = usage.daily.cost;
+        
+        if (this.dailyUsage > this.threshold * 0.8) {
+            console.warn(\`Usage at 80% of threshold: $\${this.dailyUsage}\`);
+        }
+        
+        if (this.dailyUsage > this.threshold) {
+            throw new Error('Daily usage threshold exceeded');
+        }
+    }
+    
+    getNextResetTime() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        return tomorrow.getTime();
+    }
+}</code></pre>
+    `;
+}
+
+// Export all content functions
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        getRateLimitsContent,
+        getAPIKeysContent,
+        getWebhooksContent,
+        getUsageTrackingContent
+    };
+}

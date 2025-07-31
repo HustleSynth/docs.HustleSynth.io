@@ -1,0 +1,22 @@
+{
+  "name": "hustlesynth-docs",
+  "version": "1.0.0",
+  "description": "Documentation for HustleSynth AI Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build required for static site'",
+    "preview": "npx serve ."
+  },
+  "keywords": [
+    "documentation",
+    "ai",
+    "api",
+    "hustlesynth"
+  ],
+  "author": "HustleSynth",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
