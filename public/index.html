@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HustleSynth Chat</title>
+    <meta name="description" content="AI-powered chat interface">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-bolt"></i> HustleSynth Chat</h2>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <button class="new-chat-btn" onclick="createNewChat()">
+                <i class="fas fa-plus"></i> New Chat
+            </button>
+            
+            <div class="chat-list" id="chatList">
+                <!-- Chat sessions will be dynamically added here -->
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="settings-btn" onclick="openSettings()">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <header class="chat-header">
+                <button class="mobile-menu" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="model-selector">
+                    <select id="modelSelect" onchange="updateModel()">
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="claude-3-opus">Claude 3 Opus</option>
+                        <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                        <option value="claude-2.1">Claude 2.1</option>
+                    </select>
+                </div>
+                <button class="clear-btn" onclick="clearCurrentChat()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </header>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <h1>Welcome to HustleSynth Chat</h1>
+                    <p>Select a model and start chatting with AI</p>
+                    <div class="suggestions">
+                        <button onclick="sendMessage('Explain quantum computing in simple terms')">
+                            <i class="fas fa-atom"></i> Explain quantum computing
+                        </button>
+                        <button onclick="sendMessage('Write a Python function to sort a list')">
+                            <i class="fas fa-code"></i> Python sorting function
+                        </button>
+                        <button onclick="sendMessage('What are the benefits of meditation?')">
+                            <i class="fas fa-brain"></i> Benefits of meditation
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Type your message..."
+                        rows="1"
+                        onkeydown="handleKeyPress(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="input-info">
+                    <span id="charCount">0</span> characters
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-btn" onclick="closeSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>API Keys</h3>
+                    <p class="settings-description">Add your API keys to use different AI models</p>
+                    
+                    <div class="api-key-group">
+                        <label for="openaiKey">OpenAI API Key</label>
+                        <div class="input-group">
+                            <input 
+                                type="password" 
+                                id="openaiKey" 
+                                placeholder="sk-..."
+                                onchange="saveApiKey('openai', this.value)"
+                            >
+                            <button onclick="toggleVisibility('openaiKey')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="api-key-group">
+                        <label for="anthropicKey">Anthropic API Key</label>
+                        <div class="input-group">
+                            <input 
+                                type="password" 
+                                id="anthropicKey" 
+                                placeholder="sk-ant-..."
+                                onchange="saveApiKey('anthropic', this.value)"
+                            >
+                            <button onclick="toggleVisibility('anthropicKey')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="api-key-group">
+                        <label for="hustlesynthKey">HustleSynth API Key</label>
+                        <div class="input-group">
+                            <input 
+                                type="password" 
+                                id="hustlesynthKey" 
+                                placeholder="hs-..."
+                                onchange="saveApiKey('hustlesynth', this.value)"
+                            >
+                            <button onclick="toggleVisibility('hustlesynthKey')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Preferences</h3>
+                    
+                    <div class="preference-item">
+                        <label for="temperature">Temperature</label>
+                        <input 
+                            type="range" 
+                            id="temperature" 
+                            min="0" 
+                            max="2" 
+                            step="0.1" 
+                            value="0.7"
+                            oninput="updateTemperature(this.value)"
+                        >
+                        <span id="tempValue">0.7</span>
+                    </div>
+                    
+                    <div class="preference-item">
+                        <label for="maxTokens">Max Tokens</label>
+                        <input 
+                            type="number" 
+                            id="maxTokens" 
+                            min="1" 
+                            max="4000" 
+                            value="1000"
+                            onchange="updateMaxTokens(this.value)"
+                        >
+                    </div>
+
+                    <div class="preference-item">
+                        <label>
+                            <input 
+                                type="checkbox" 
+                                id="streamResponses" 
+                                checked
+                                onchange="updateStreaming(this.checked)"
+                            >
+                            Stream responses
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Data</h3>
+                    <button class="danger-btn" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                    <button class="export-btn" onclick="exportChats()">
+                        <i class="fas fa-download"></i> Export Chats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
