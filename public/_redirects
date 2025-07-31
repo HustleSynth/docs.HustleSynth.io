@@ -1,2 +1,6 @@
-/api/* https://chat.hustlesynth.space/:splat 200
-/* /index.html 200
+/                  /index.html         200
+/docs              /index.html#api-overview  301
+/api               /index.html#api-overview  301
+/quickstart        /index.html#quickstart    301
+/authentication    /index.html#authentication 301
+/*                 /index.html         200
