@@ -1,0 +1,195 @@
+Microsoft Windows [Version 10.0.19045.6093]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\anton>cd C:\Users\anton\Documents\GitHub\docs.HustleSynth.io
+
+C:\Users\anton\Documents\GitHub\docs.HustleSynth.io>dir /s
+ Volume in drive C has no label.
+ Volume Serial Number is 9690-17E5
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io
+
+07/31/2025  10:01 PM    <DIR>          .
+07/31/2025  10:01 PM    <DIR>          ..
+07/31/2025  10:01 PM    <DIR>          .github
+07/31/2025  09:34 PM            31,024 additional-content.json
+07/31/2025  09:34 PM            27,170 app.js
+07/31/2025  09:34 PM                22 CNAME
+07/31/2025  09:34 PM            28,076 content.js
+07/31/2025  09:34 PM            53,276 examples-content.json
+07/31/2025  09:34 PM            31,965 final-content.js
+07/31/2025  09:34 PM            11,050 index.html
+07/31/2025  09:34 PM               472 package.json
+07/31/2025  10:01 PM    <DIR>          public
+07/31/2025  09:34 PM            12,638 styles.css
+07/31/2025  09:34 PM             4,907 worker.js
+07/31/2025  09:34 PM                 0 wranger.toml
+              11 File(s)        200,600 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git
+
+07/31/2025  09:34 PM               372 config
+07/31/2025  09:34 PM                73 description
+07/31/2025  09:40 PM               110 FETCH_HEAD
+07/31/2025  09:34 PM                21 HEAD
+07/31/2025  09:34 PM    <DIR>          hooks
+07/31/2025  10:01 PM             1,451 index
+07/31/2025  09:34 PM    <DIR>          info
+07/31/2025  09:34 PM    <DIR>          logs
+07/31/2025  09:40 PM    <DIR>          objects
+07/31/2025  09:34 PM               112 packed-refs
+07/31/2025  09:34 PM    <DIR>          refs
+               6 File(s)          2,139 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\hooks
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM               478 applypatch-msg.sample
+07/31/2025  09:34 PM               896 commit-msg.sample
+07/31/2025  09:34 PM             4,726 fsmonitor-watchman.sample
+07/31/2025  09:34 PM               189 post-update.sample
+07/31/2025  09:34 PM               424 pre-applypatch.sample
+07/31/2025  09:34 PM             1,649 pre-commit.sample
+07/31/2025  09:34 PM               416 pre-merge-commit.sample
+07/31/2025  09:34 PM             1,374 pre-push.sample
+07/31/2025  09:34 PM             4,898 pre-rebase.sample
+07/31/2025  09:34 PM               544 pre-receive.sample
+07/31/2025  09:34 PM             1,492 prepare-commit-msg.sample
+07/31/2025  09:34 PM             2,783 push-to-checkout.sample
+07/31/2025  09:34 PM             2,308 sendemail-validate.sample
+07/31/2025  09:34 PM             3,650 update.sample
+              14 File(s)         25,827 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\info
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM               240 exclude
+               1 File(s)            240 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\logs
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM               221 HEAD
+07/31/2025  09:34 PM    <DIR>          refs
+               1 File(s)            221 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\logs\refs
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM    <DIR>          heads
+07/31/2025  09:34 PM    <DIR>          remotes
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\logs\refs\heads
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM               221 main
+               1 File(s)            221 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\logs\refs\remotes
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM    <DIR>          origin
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\logs\refs\remotes\origin
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:40 PM               381 HEAD
+               1 File(s)            381 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\objects
+
+07/31/2025  09:40 PM    <DIR>          .
+07/31/2025  09:40 PM    <DIR>          ..
+07/31/2025  09:34 PM    <DIR>          info
+07/31/2025  09:34 PM    <DIR>          pack
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\objects\info
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\objects\pack
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM             1,800 pack-f622c6dca0dc8c57d7f1d3fa6d3f41c8b055530f.idx
+07/31/2025  09:34 PM            56,452 pack-f622c6dca0dc8c57d7f1d3fa6d3f41c8b055530f.pack
+07/31/2025  09:34 PM               156 pack-f622c6dca0dc8c57d7f1d3fa6d3f41c8b055530f.rev
+               3 File(s)         58,408 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\refs
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM    <DIR>          heads
+07/31/2025  09:34 PM    <DIR>          remotes
+07/31/2025  09:34 PM    <DIR>          tags
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\refs\heads
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:34 PM                41 main
+               1 File(s)             41 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\refs\remotes
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+07/31/2025  09:40 PM    <DIR>          origin
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\refs\remotes\origin
+
+07/31/2025  09:40 PM    <DIR>          .
+07/31/2025  09:40 PM    <DIR>          ..
+07/31/2025  09:40 PM                30 HEAD
+               1 File(s)             30 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.git\refs\tags
+
+07/31/2025  09:34 PM    <DIR>          .
+07/31/2025  09:34 PM    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.github
+
+07/31/2025  10:01 PM    <DIR>          .
+07/31/2025  10:01 PM    <DIR>          ..
+07/31/2025  10:01 PM    <DIR>          workflows
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\.github\workflows
+
+07/31/2025  10:01 PM    <DIR>          .
+07/31/2025  10:01 PM    <DIR>          ..
+07/31/2025  10:01 PM               673 deploy.yml
+               1 File(s)            673 bytes
+
+ Directory of C:\Users\anton\Documents\GitHub\docs.HustleSynth.io\public
+
+07/31/2025  10:01 PM    <DIR>          .
+07/31/2025  10:01 PM    <DIR>          ..
+07/31/2025  10:01 PM            16,705 app.js
+07/31/2025  10:01 PM             9,308 index.html
+07/31/2025  10:01 PM            13,531 styles.css
+07/31/2025  10:01 PM                68 _redirects
+               4 File(s)         39,612 bytes
+
+     Total Files Listed:
+              45 File(s)        328,393 bytes
+              56 Dir(s)  108,213,571,584 bytes free
+
+C:\Users\anton\Documents\GitHub\docs.HustleSynth.io>
