@@ -12,6 +12,16 @@
     <meta property="og:description" content="Complete API reference and guides for HustleSynth AI Platform">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://docs.hustlesynth.space">
+    <meta property="og:image" content="https://docs.hustlesynth.space/og-image.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HustleSynth Documentation">
+    <meta name="twitter:description" content="Complete API reference and guides for HustleSynth AI Platform">
+    <meta name="twitter:image" content="https://docs.hustlesynth.space/og-image.png">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://docs.hustlesynth.space">
     
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -20,6 +30,7 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 <body>
     <!-- Header -->
@@ -46,9 +57,10 @@
                 </a>
                 <a href="https://github.com/HustleSynth" class="header-link">
                     <i class="fab fa-github"></i>
+                    <span>GitHub</span>
                 </a>
                 <button class="theme-toggle" onclick="toggleTheme()">
-                    <i class="fas fa-moon" id="themeIcon"></i>
+                    <i id="themeIcon" class="fas fa-moon"></i>
                 </button>
             </div>
         </div>
@@ -57,113 +69,113 @@
     <!-- Main Container -->
     <div class="main-container">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <nav class="nav-menu">
-                <div class="nav-section">
-                    <h3>Getting Started</h3>
-                    <ul>
-                        <li><a href="#introduction" class="nav-link active" onclick="loadContent('introduction')">
-                            <i class="fas fa-home"></i> Introduction
-                        </a></li>
-                        <li><a href="#quickstart" class="nav-link" onclick="loadContent('quickstart')">
-                            <i class="fas fa-rocket"></i> Quick Start
-                        </a></li>
-                        <li><a href="#authentication" class="nav-link" onclick="loadContent('authentication')">
-                            <i class="fas fa-key"></i> Authentication
-                        </a></li>
-                        <li><a href="#pricing" class="nav-link" onclick="loadContent('pricing')">
-                            <i class="fas fa-tag"></i> Pricing
-                        </a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-section">
-                    <h3>API Reference</h3>
-                    <ul>
-                        <li><a href="#api-overview" class="nav-link" onclick="loadContent('api-overview')">
-                            <i class="fas fa-book"></i> Overview
-                        </a></li>
-                        <li><a href="#chat-completions" class="nav-link" onclick="loadContent('chat-completions')">
-                            <i class="fas fa-comments"></i> Chat Completions
-                        </a></li>
-                        <li><a href="#models" class="nav-link" onclick="loadContent('models')">
-                            <i class="fas fa-brain"></i> Available Models
-                        </a></li>
-                        <li><a href="#streaming" class="nav-link" onclick="loadContent('streaming')">
-                            <i class="fas fa-stream"></i> Streaming
-                        </a></li>
-                        <li><a href="#rate-limits" class="nav-link" onclick="loadContent('rate-limits')">
-                            <i class="fas fa-tachometer-alt"></i> Rate Limits
-                        </a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-section">
-                    <h3>Features</h3>
-                    <ul>
-                        <li><a href="#api-keys" class="nav-link" onclick="loadContent('api-keys')">
-                            <i class="fas fa-shield-alt"></i> API Keys
-                        </a></li>
-                        <li><a href="#webhooks" class="nav-link" onclick="loadContent('webhooks')">
-                            <i class="fas fa-webhook"></i> Webhooks
-                        </a></li>
-                        <li><a href="#usage-tracking" class="nav-link" onclick="loadContent('usage-tracking')">
-                            <i class="fas fa-chart-line"></i> Usage Tracking
-                        </a></li>
-                        <li><a href="#services" class="nav-link" onclick="loadContent('services')">
-                            <i class="fas fa-cube"></i> Services
-                        </a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-section">
-                    <h3>SDKs & Libraries</h3>
-                    <ul>
-                        <li><a href="#javascript-sdk" class="nav-link" onclick="loadContent('javascript-sdk')">
-                            <i class="fab fa-js"></i> JavaScript/Node.js
-                        </a></li>
-                        <li><a href="#python-sdk" class="nav-link" onclick="loadContent('python-sdk')">
-                            <i class="fab fa-python"></i> Python
-                        </a></li>
-                        <li><a href="#rest-api" class="nav-link" onclick="loadContent('rest-api')">
-                            <i class="fas fa-code"></i> REST API
-                        </a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-section">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="#examples" class="nav-link" onclick="loadContent('examples')">
-                            <i class="fas fa-code-branch"></i> Examples
-                        </a></li>
-                        <li><a href="#best-practices" class="nav-link" onclick="loadContent('best-practices')">
-                            <i class="fas fa-lightbulb"></i> Best Practices
-                        </a></li>
-                        <li><a href="#troubleshooting" class="nav-link" onclick="loadContent('troubleshooting')">
-                            <i class="fas fa-tools"></i> Troubleshooting
-                        </a></li>
-                        <li><a href="#changelog" class="nav-link" onclick="loadContent('changelog')">
-                            <i class="fas fa-history"></i> Changelog
-                        </a></li>
-                    </ul>
-                </div>
-            </nav>
-        </aside>
+        <nav class="sidebar" id="sidebar">
+            <div class="nav-section">
+                <h3>Getting Started</h3>
+                <ul class="nav-links">
+                    <li><a href="#introduction" class="nav-link active" onclick="loadContent('introduction')">
+                        <i class="fas fa-home"></i> Introduction
+                    </a></li>
+                    <li><a href="#quickstart" class="nav-link" onclick="loadContent('quickstart')">
+                        <i class="fas fa-rocket"></i> Quick Start
+                    </a></li>
+                    <li><a href="#authentication" class="nav-link" onclick="loadContent('authentication')">
+                        <i class="fas fa-key"></i> Authentication
+                    </a></li>
+                    <li><a href="#pricing" class="nav-link" onclick="loadContent('pricing')">
+                        <i class="fas fa-dollar-sign"></i> Pricing
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>API Reference</h3>
+                <ul class="nav-links">
+                    <li><a href="#api-overview" class="nav-link" onclick="loadContent('api-overview')">
+                        <i class="fas fa-cube"></i> API Overview
+                    </a></li>
+                    <li><a href="#chat-completions" class="nav-link" onclick="loadContent('chat-completions')">
+                        <i class="fas fa-comments"></i> Chat Completions
+                    </a></li>
+                    <li><a href="#models" class="nav-link" onclick="loadContent('models')">
+                        <i class="fas fa-brain"></i> Available Models
+                    </a></li>
+                    <li><a href="#streaming" class="nav-link" onclick="loadContent('streaming')">
+                        <i class="fas fa-stream"></i> Streaming
+                    </a></li>
+                    <li><a href="#rate-limits" class="nav-link" onclick="loadContent('rate-limits')">
+                        <i class="fas fa-tachometer-alt"></i> Rate Limits
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Account Management</h3>
+                <ul class="nav-links">
+                    <li><a href="#api-keys" class="nav-link" onclick="loadContent('api-keys')">
+                        <i class="fas fa-lock"></i> API Keys
+                    </a></li>
+                    <li><a href="#webhooks" class="nav-link" onclick="loadContent('webhooks')">
+                        <i class="fas fa-plug"></i> Webhooks
+                    </a></li>
+                    <li><a href="#usage-tracking" class="nav-link" onclick="loadContent('usage-tracking')">
+                        <i class="fas fa-chart-line"></i> Usage Tracking
+                    </a></li>
+                    <li><a href="#services" class="nav-link" onclick="loadContent('services')">
+                        <i class="fas fa-cogs"></i> Services
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>SDKs & Libraries</h3>
+                <ul class="nav-links">
+                    <li><a href="#javascript-sdk" class="nav-link" onclick="loadContent('javascript-sdk')">
+                        <i class="fab fa-js"></i> JavaScript SDK
+                    </a></li>
+                    <li><a href="#python-sdk" class="nav-link" onclick="loadContent('python-sdk')">
+                        <i class="fab fa-python"></i> Python SDK
+                    </a></li>
+                    <li><a href="#rest-api" class="nav-link" onclick="loadContent('rest-api')">
+                        <i class="fas fa-code"></i> REST API
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Resources</h3>
+                <ul class="nav-links">
+                    <li><a href="#examples" class="nav-link" onclick="loadContent('examples')">
+                        <i class="fas fa-book"></i> Examples
+                    </a></li>
+                    <li><a href="#best-practices" class="nav-link" onclick="loadContent('best-practices')">
+                        <i class="fas fa-star"></i> Best Practices
+                    </a></li>
+                    <li><a href="#troubleshooting" class="nav-link" onclick="loadContent('troubleshooting')">
+                        <i class="fas fa-wrench"></i> Troubleshooting
+                    </a></li>
+                    <li><a href="#changelog" class="nav-link" onclick="loadContent('changelog')">
+                        <i class="fas fa-history"></i> Changelog
+                    </a></li>
+                </ul>
+            </div>
+        </nav>
 
         <!-- Content Area -->
-        <main class="content" id="content">
-            <!-- Content will be dynamically loaded here -->
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading documentation...</p>
+        <main class="content-area">
+            <div class="content" id="content">
+                <!-- Content will be loaded here dynamically -->
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading documentation...</p>
+                </div>
             </div>
         </main>
 
-        <!-- Table of Contents (for current page) -->
-        <aside class="toc" id="toc">
+        <!-- Table of Contents (right sidebar) -->
+        <aside class="toc-sidebar">
             <h4>On this page</h4>
-            <ul id="tocList">
+            <ul class="toc-list" id="tocList">
                 <!-- TOC items will be generated dynamically -->
             </ul>
         </aside>
@@ -176,9 +188,9 @@
                 <h4>HustleSynth</h4>
                 <p>The unified AI platform for developers</p>
                 <div class="social-links">
-                    <a href="https://github.com/HustleSynth"><i class="fab fa-github"></i></a>
-                    <a href="https://twitter.com/HustleSynth"><i class="fab fa-twitter"></i></a>
-                    <a href="https://discord.gg/hustlesynth"><i class="fab fa-discord"></i></a>
+                    <a href="https://github.com/HustleSynth" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="https://twitter.com/HustleSynth" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://discord.gg/hustlesynth" aria-label="Discord"><i class="fab fa-discord"></i></a>
                 </div>
             </div>
             <div class="footer-section">
@@ -187,6 +199,7 @@
                     <li><a href="#introduction">Getting Started</a></li>
                     <li><a href="#api-overview">API Reference</a></li>
                     <li><a href="#examples">Examples</a></li>
+                    <li><a href="#sdks">SDKs</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -195,6 +208,7 @@
                     <li><a href="https://panel.hustlesynth.space">Dashboard</a></li>
                     <li><a href="https://chat.hustlesynth.space">Chat Interface</a></li>
                     <li><a href="https://status.hustlesynth.space">Status Page</a></li>
+                    <li><a href="https://api.hustlesynth.space">API Endpoint</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -203,11 +217,12 @@
                     <li><a href="mailto:support@hustlesynth.space">Email Support</a></li>
                     <li><a href="https://discord.gg/hustlesynth">Discord Community</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 HustleSynth. All rights reserved.</p>
+            <p>&copy; 2024 HustleSynth. All rights reserved. | <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
         </div>
     </footer>
 
@@ -218,5 +233,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
     <script src="app.js"></script>
+    
+    <!-- Initialize -->
+    <script>
+        // Load initial content
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1) || 'introduction';
+            loadContent(hash, false);
+            
+            // Handle browser back/forward
+            window.addEventListener('popstate', function(event) {
+                const contentId = event.state?.content || 'introduction';
+                loadContent(contentId, false);
+            });
+            
+            // Apply saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        });
+    </script>
 </body>
 </html>

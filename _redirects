@@ -1,0 +1,9 @@
+# Cloudflare Pages redirects
+# This ensures client-side routing works properly
+
+/*    /index.html    200
+
+# Redirect common paths
+/docs    /    301
+/api     /#api-overview    301
+/getting-started    /#quickstart    301
